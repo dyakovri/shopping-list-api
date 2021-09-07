@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - 80:80
+    environment:
+      APP_MODULE: shopping_list.main:app
+      DB_DSN: postgresql://postgres@postgres:5432/postgres
+    networks:
+      - default
+      - backend
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - backend
+
+networks:
+  backend:

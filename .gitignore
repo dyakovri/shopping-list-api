@@ -1,0 +1,33 @@
+# Text backup files
+*.bak
+
+# Database
+*.sqlite3
+*.db
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+venv/
+
+# build
+build/
+dist/
+shopping_list.egg-info/
+
+# PyCharm
+.idea
+
+# dotenv
+.env
+
+# CI/CD
+.venv/
+.wheels/
+.core
+
+# OS
+.DS_Store
