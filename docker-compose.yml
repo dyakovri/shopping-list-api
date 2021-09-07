@@ -7,7 +7,6 @@ services:
     ports:
       - 80:80
     environment:
-      APP_MODULE: shopping_list.main:app
       DB_DSN: ${DB_DSN}
     networks:
       - default
