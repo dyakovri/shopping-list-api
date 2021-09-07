@@ -1,0 +1,19 @@
+import uuid
+from datetime import datetime
+
+from sqlalchemy import Column
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import DateTime
+
+from .base import Model
+
+
+class List(Model):
+    __tablename__ = 'list'
+
+    id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    items = relationship('Item', back_populates='list', order_by='Item.order')
