@@ -1,7 +1,7 @@
 """Init tables
 
 Revision ID: a72ee20a3055
-Revises: 
+Revises:
 Create Date: 2021-09-07 14:06:37.637015
 
 """
@@ -31,13 +31,14 @@ def upgrade():
     )
     op.create_table('item',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
+    sa.Column('list_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('name', sa.String(length=256), nullable=True),
     sa.Column('order', sa.Integer(), nullable=True),
-    sa.Column('list_id', postgresql.UUID(as_uuid=True), nullable=True),
+    sa.Column('check', sa.Boolean(), nullable=False, default=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['list_id'], ['list.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', 'list_id')
     )
     # ### end Alembic commands ###
 

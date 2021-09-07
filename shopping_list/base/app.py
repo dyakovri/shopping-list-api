@@ -23,4 +23,3 @@ def create_app() -> FastAPI:
         session_args={'autocommit': False, 'autoflush': False},
     )
     return app
-

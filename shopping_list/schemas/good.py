@@ -10,23 +10,13 @@ class Good(BaseSchema):
 
 
 class GoodGet(Good):
-    name: Optional[str] = Field(
-        None, description="Recomendations for request", example="Milk 1l"
-    )
+    name: Optional[str] = Field(None, description="Recomendations for request", example="Milk 1l")
 
 
 class GoodRequest(Good):
-    query: str = Field(
-        None,
-        description="Recomendation request",
-        example="Mil"
-    )
+    query: str = Field(None, description="Recomendation request", example="Mil")
 
 
 class GoodListGet(BaseSchema):
-    query: str = Field(
-        None,
-        description="Recomendation request",
-        example="Mil"
-    )
+    query: str = Field(None, description="Recomendation request", example="Mil")
     items: List[GoodGet]

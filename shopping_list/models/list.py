@@ -12,7 +12,7 @@ from .base import BaseModel
 class List(BaseModel):
     __tablename__ = 'list'
 
-    id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    list_id = Column('id', postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
