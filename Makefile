@@ -10,4 +10,4 @@ down:
 	docker-compose down
 
 migrate:
-	docker-compose run api bash -c 'alembic upgrade head'
+	docker-compose run --rm api bash -c 'alembic upgrade head'
