@@ -7,6 +7,7 @@ from pydantic.networks import PostgresDsn
 
 class Settings(BaseSettings):
     DB_DSN: PostgresDsn = None
+    OPENAPI_PREFIX: str = ''
 
 
 @lru_cache()

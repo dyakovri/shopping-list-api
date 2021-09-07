@@ -12,6 +12,7 @@ def create_app() -> FastAPI:
         title='Shopping list API',
         description='DIPD project. Shopping list app.',
         version=__version__,
+        openapi_prefix=settings.OPENAPI_PREFIX,
     )
     app.include_router(list_router, prefix='/lists', tags=['List'])
     app.include_router(item_router, prefix='/lists/{list_id}/items', tags=['Item'])
