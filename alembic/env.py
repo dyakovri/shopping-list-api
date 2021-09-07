@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 
 from shopping_list.base.settings import get_settings
-from shopping_list.models import Model
+from shopping_list.models import BaseModel
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
@@ -14,7 +14,7 @@ settings = get_settings()
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
-target_metadata = Model.metadata
+target_metadata = BaseModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

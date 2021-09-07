@@ -7,10 +7,10 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime, Integer, String
 
-from .base import Model
+from .base import BaseModel
 
 
-class Item(Model):
+class Item(BaseModel):
     __tablename__ = 'item'
 
     id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

@@ -6,10 +6,10 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import DateTime
 
-from .base import Model
+from .base import BaseModel
 
 
-class List(Model):
+class List(BaseModel):
     __tablename__ = 'list'
 
     id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
