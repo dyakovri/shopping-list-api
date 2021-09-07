@@ -4,6 +4,7 @@ from fastapi_utils.cbv import cbv
 
 router = APIRouter()
 
+
 @cbv(router)
 class ListHandler:
     @router.post('/')
@@ -14,10 +15,10 @@ class ListHandler:
     def get_list(self, list_id: str):
         pass
 
-    @router.post('/{list_id}/share')
+    @router.post('/{list_id}:share')
     def share_list(self, list_id: str):
         pass
 
-    @router.post('/{list_id}/checkall')
+    @router.post('/{list_id}:checkall')
     def mark_bought(self, list_id: str):
         pass

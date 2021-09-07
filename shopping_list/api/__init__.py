@@ -1,5 +1,5 @@
-from .item import router as ItemRouter
-from .list import router as ListRouter
-from .good import router as GoodRouter
+from .list import router as list_router
+from .item import router as item_router
+from .good import router as good_router
 
-__all__ = ['ItemRouter', 'ListRouter', 'GoodRouter']
+__all__ = ['list_router', 'item_router', 'good_router']
