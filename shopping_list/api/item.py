@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from shopping_list.models.item import Item
+from shopping_list.models.list import List
 from shopping_list.schemas import ItemCreate, ItemGet, ItemUpdate
 
 
@@ -22,13 +23,19 @@ class ItemHandler:
         responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
     )
     def create_item(
-        self, item_in: ItemCreate, list_id: UUID4 = Query(None, description='Shopping list ID')
+        self,
+        item_in: ItemCreate,
+        user_id: UUID4 = Query(None, description='User ID'),
+        list_id: UUID4 = Query(None, description='Shopping list ID'),
     ):
         session = db.session
         try:
-            item = Item(name=item_in.name, order=item_in.order, list_id=list_id)
+            lst = (
+                session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
+            )
+            item = Item(name=item_in.name, order=item_in.order, list_id=lst.list_id)
             session.add(item)
-        except IntegrityError:
+        except (NoResultFound, IntegrityError):
             raise HTTPException(status.HTTP_404_NOT_FOUND, 'List not found')
         session.commit()
         return item
@@ -42,13 +49,18 @@ class ItemHandler:
     def change_item(
         self,
         item_in: ItemUpdate,
+        user_id: UUID4 = Query(None, description='User ID'),
         list_id: UUID4 = Query(None, description='Shopping list ID'),
         item_id: UUID4 = Query(None, description='Shopping list item ID'),
     ):
         session = db.session
         try:
             item = (
-                session.query(Item).filter(Item.item_id == item_id).filter(Item.list_id == list_id).one()
+                session.query(Item)
+                .filter(Item.list.user_id == user_id)
+                .filter(Item.item_id == item_id)
+                .filter(Item.list_id == list_id)
+                .one()
             )
         except NoResultFound:
             raise HTTPException(404, "Item not found")
@@ -64,13 +76,19 @@ class ItemHandler:
     )
     def delete_item(
         self,
+        user_id: UUID4 = Query(None, description='User ID'),
         list_id: UUID4 = Query(None, description='Shopping list ID'),
         item_id: UUID4 = Query(None, description='Shopping list item ID'),
     ):
         session = db.session
         try:
             item = (
-                session.query(Item).filter(Item.item_id == item_id).filter(Item.list_id == list_id).one()
+                session.query(Item)
+                .join(List)
+                .filter(List.user_id == user_id)
+                .filter(Item.item_id == item_id)
+                .filter(Item.list_id == list_id)
+                .one()
             )
         except NoResultFound:
             raise HTTPException(404, "Item not found")
