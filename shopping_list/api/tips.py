@@ -13,11 +13,13 @@ router = APIRouter()
 
 
 @cbv(router)
-class GoodHandler:
-    @router.get('/good', response_model=GoodListGet)
+class TipsHandler:
+    @router.get('/tips', response_model=GoodListGet)
     def get_recommendation(
         self, user_id, query: str = Query(None, description="Part of good name", example="Mil")
     ) -> GoodListGet:
         session = db.session
-        goods = session.query(Item.name).join(List).filter(List.user_id == user_id).limit(5).all()
+        goods = (
+            session.query(Item.name).join(List).filter(List.user_id == user_id).distinct().limit(5).all()
+        )
         return {'query': query, 'items': goods}

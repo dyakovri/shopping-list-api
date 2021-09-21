@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware
 
 from shopping_list import __version__
-from shopping_list.api import good_router, item_router, list_router, user_router
+from shopping_list.api import item_router, list_router, tips_router, user_router
 from shopping_list.base.settings import get_settings
 
 
@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
         openapi_prefix=settings.OPENAPI_PREFIX,
     )
     app.include_router(user_router, prefix='/users', tags=['User'])
-    app.include_router(good_router, prefix='/users/{user_id}/goods', tags=['Autocomplete'])
+    app.include_router(tips_router, prefix='/users/{user_id}/goods', tags=['Autocomplete'])
     app.include_router(list_router, prefix='/users/{user_id}/lists', tags=['List'])
     app.include_router(item_router, prefix='/users/{user_id}/lists/{list_id}/items', tags=['Item'])
     app.add_middleware(
