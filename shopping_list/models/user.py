@@ -17,3 +17,4 @@ class User(BaseModel):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     lists = relationship('List', back_populates='user', order_by='List.updated_at')
+    faves = relationship('Fave', back_populates='user', order_by='Fave.name')

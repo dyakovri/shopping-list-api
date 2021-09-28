@@ -33,6 +33,7 @@ class ItemHandler:
             lst = (
                 session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
             )
+            # TODO: In favourites
             item = Item(name=item_in.name, order=item_in.order, list_id=lst.list_id)
             session.add(item)
         except (NoResultFound, IntegrityError):
@@ -62,6 +63,7 @@ class ItemHandler:
                 .filter(Item.list_id == list_id)
                 .one()
             )
+            # TODO: In favourites
         except NoResultFound:
             raise HTTPException(404, "Item not found")
         item = Item(item_id=item_id, list_id=list_id, **item_in.dict(exclude_unset=True))
@@ -95,3 +97,33 @@ class ItemHandler:
         session.delete(item)
         session.commit()
         return item
+
+    @router.post(
+        '/{item_id}:fave',
+        response_model=ItemGet,
+        status_code=status.HTTP_202_ACCEPTED,
+        responses={status.HTTP_404_NOT_FOUND: {'details': 'Item not found'}},
+    )
+    def fave_item(
+        self,
+        user_id: UUID4 = Query(None, description='User ID'),
+        list_id: UUID4 = Query(None, description='Shopping list ID'),
+        item_id: UUID4 = Query(None, description='Shopping list item ID'),
+    ):
+        # TODO: Add to favourites
+        return
+
+    @router.delete(
+        '/{item_id}:fave',
+        response_model=ItemGet,
+        status_code=status.HTTP_202_ACCEPTED,
+        responses={status.HTTP_404_NOT_FOUND: {'details': 'Item not found'}},
+    )
+    def unfave_item(
+        self,
+        user_id: UUID4 = Query(None, description='User ID'),
+        list_id: UUID4 = Query(None, description='Shopping list ID'),
+        item_id: UUID4 = Query(None, description='Shopping list item ID'),
+    ):
+        # TODO: Drop favourites
+        return

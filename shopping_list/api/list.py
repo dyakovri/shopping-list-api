@@ -43,10 +43,12 @@ class ListHandler:
             lst = (
                 session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
             )
+            # TODO: In favourites
         except NoResultFound:
             raise HTTPException(404, "List not found")
         return lst
 
+    # TODO: Sharing
     # @router.post('/{list_id}:share', response_model=ListGet, status_code=status.HTTP_200_OK)
     # def share_list(
     #     self,
