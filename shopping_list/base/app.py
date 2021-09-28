@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
         openapi_prefix=settings.OPENAPI_PREFIX,
     )
     app.include_router(user_router, prefix='/users', tags=['User'])
-    app.include_router(tips_router, prefix='/users/{user_id}/goods', tags=['Autocomplete'])
+    app.include_router(tips_router, prefix='/users/{user_id}', tags=['Autocomplete'])
     app.include_router(list_router, prefix='/users/{user_id}/lists', tags=['List'])
     app.include_router(item_router, prefix='/users/{user_id}/lists/{list_id}/items', tags=['Item'])
     app.add_middleware(
