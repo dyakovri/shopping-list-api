@@ -13,7 +13,7 @@ class Item(BaseSchema):
 class ItemGet(Item):
     item_id: UUID4
     check: Optional[bool] = Field(False, description='Is bought check', example=True)
-    faved: bool = Field(False, description='Is product in favourites list')
+    fave_id: Optional[UUID4] = Field(description='Id of fave if product in favourites list')
 
 
 class ItemCreate(Item):

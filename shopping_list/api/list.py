@@ -8,6 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from starlette import status
 
 from shopping_list.models import Item, List
+from shopping_list.models.fave import Fave
 from shopping_list.schemas import ListGet
 
 
@@ -43,13 +44,18 @@ class ListHandler:
             lst = (
                 session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
             )
-            # TODO: In favourites
         except NoResultFound:
             raise HTTPException(404, "List not found")
-        return lst
+        items = (
+            session.query(Item.item_id, Item.name, Item.check, Fave.fave_id)
+            .outerjoin(Fave, Fave.name == Item.name)
+            .order_by(Item.order)
+            .all()
+        )
+        return {'list_id': lst.list_id, 'name': lst.name, 'items': items}
 
     # TODO: Sharing
-    # @router.post('/{list_id}:share', response_model=ListGet, status_code=status.HTTP_200_OK)
+    # @router.post('/{list_id}/share', response_model=ListGet, status_code=status.HTTP_200_OK)
     # def share_list(
     #     self,
     #     user_id: UUID4 = Query(None, description='User ID'),
@@ -74,7 +80,7 @@ class ListHandler:
     #     return new_lst
 
     @router.post(
-        '/{list_id}:checkall',
+        '/{list_id}/checkall',
         response_model=ListGet,
         status_code=status.HTTP_200_OK,
         responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
