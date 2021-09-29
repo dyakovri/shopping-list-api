@@ -23,7 +23,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     networks:
       - backend
 
@@ -33,3 +33,7 @@ networks:
     name: web
     external: true
   backend:
+
+volumes:
+  postgres:
+    name: shopping_list-data
