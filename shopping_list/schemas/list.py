@@ -8,9 +8,9 @@ from .item import ItemGet
 
 
 class ShoppingList(BaseSchema):
-    pass
+    list_id: UUID4
+    name: str
 
 
 class ListGet(ShoppingList):
-    list_id: UUID4
     items: List[ItemGet]

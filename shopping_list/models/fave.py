@@ -10,14 +10,12 @@ from sqlalchemy.sql.sqltypes import DateTime, String
 from .base import BaseModel
 
 
-class List(BaseModel):
-    __tablename__ = 'list'
+class Fave(BaseModel):
+    __tablename__ = 'fave'
 
-    list_id = Column('id', postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    fave_id = Column('id', postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(postgresql.UUID(as_uuid=True), ForeignKey('user.id'), primary_key=True)
-    name = Column(String, default='New shopping list', nullable=False)
+    name = Column(String(256))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user = relationship('User', back_populates='lists')
-    items = relationship('Item', back_populates='list', order_by='Item.order')
+    user = relationship('User', back_populates='faves')
