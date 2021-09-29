@@ -49,7 +49,7 @@ class ListHandler:
         return lst
 
     # TODO: Sharing
-    # @router.post('/{list_id}:share', response_model=ListGet, status_code=status.HTTP_200_OK)
+    # @router.post('/{list_id}/share', response_model=ListGet, status_code=status.HTTP_200_OK)
     # def share_list(
     #     self,
     #     user_id: UUID4 = Query(None, description='User ID'),
@@ -74,7 +74,7 @@ class ListHandler:
     #     return new_lst
 
     @router.post(
-        '/{list_id}:checkall',
+        '/{list_id}/checkall',
         response_model=ListGet,
         status_code=status.HTTP_200_OK,
         responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
