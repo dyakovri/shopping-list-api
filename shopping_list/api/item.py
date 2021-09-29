@@ -35,13 +35,17 @@ class ItemHandler:
             lst = (
                 session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
             )
-            # TODO: In favourites
             item = Item(name=item_in.name, order=item_in.order, list_id=lst.list_id)
             session.add(item)
         except (NoResultFound, IntegrityError):
             raise HTTPException(status.HTTP_404_NOT_FOUND, 'List not found')
         session.commit()
-        return item
+        # Is item in faves
+        fave: Fave = (
+            session.query(Fave).filter(Fave.user_id == user_id, Fave.name == item.name).one_or_none()
+        )
+        fave_id = fave.fave_id if fave else None
+        return {'name': item.name, 'item_id': item.item_id, 'check': item.check, 'fave_id': fave_id}
 
     @router.patch(
         '/{item_id}',
@@ -60,18 +64,21 @@ class ItemHandler:
         try:
             item = (
                 session.query(Item)
-                .filter(Item.list.user_id == user_id)
-                .filter(Item.item_id == item_id)
-                .filter(Item.list_id == list_id)
+                .join(List, User)
+                .filter(User.user_id == user_id, List.list_id == list_id, Item.item_id == item_id)
                 .one()
             )
-            # TODO: In favourites
         except NoResultFound:
             raise HTTPException(404, "Item not found")
         item = Item(item_id=item_id, list_id=list_id, **item_in.dict(exclude_unset=True))
         item = session.merge(item)
         session.commit()
-        return item
+        # Is item in faves
+        fave: Fave = (
+            session.query(Fave).filter(Fave.user_id == user_id, Fave.name == item.name).one_or_none()
+        )
+        fave_id = fave.fave_id if fave else None
+        return {'name': item.name, 'item_id': item.item_id, 'check': item.check, 'fave_id': fave_id}
 
     @router.delete(
         '/{item_id}',
@@ -88,17 +95,14 @@ class ItemHandler:
         try:
             item = (
                 session.query(Item)
-                .join(List)
-                .filter(List.user_id == user_id)
-                .filter(Item.item_id == item_id)
-                .filter(Item.list_id == list_id)
+                .join(List, User)
+                .filter(User.user_id == user_id, List.list_id == list_id, Item.item_id == item_id)
                 .one()
             )
         except NoResultFound:
             raise HTTPException(404, "Item not found")
         session.delete(item)
         session.commit()
-        return item
 
     @router.post(
         '/{item_id}/fave',
