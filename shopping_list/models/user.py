@@ -16,5 +16,7 @@ class User(BaseModel):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    lists = relationship('List', back_populates='user', order_by='List.updated_at')
+    lists = relationship(
+        'List', back_populates='users', order_by='List.updated_at', secondary='list_user_link'
+    )
     faves = relationship('Fave', back_populates='user', order_by='Fave.name')

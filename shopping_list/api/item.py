@@ -8,7 +8,7 @@ from pydantic.types import UUID4
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-from shopping_list.models import Fave, Item, List, User
+from shopping_list.models import Fave, Item, List, ListUserLink, User
 from shopping_list.schemas import ItemCreate, ItemGet, ItemUpdate
 
 
@@ -33,7 +33,10 @@ class ItemHandler:
         session = db.session
         try:
             lst = (
-                session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
+                session.query(List)
+                .join(ListUserLink, User)
+                .filter(User.user_id == user_id, List.list_id == list_id)
+                .one()
             )
             item = Item(name=item_in.name, order=item_in.order, list_id=lst.list_id)
             session.add(item)
@@ -64,7 +67,7 @@ class ItemHandler:
         try:
             item = (
                 session.query(Item)
-                .join(List, User)
+                .join(List, ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id, Item.item_id == item_id)
                 .one()
             )
@@ -95,7 +98,7 @@ class ItemHandler:
         try:
             item = (
                 session.query(Item)
-                .join(List, User)
+                .join(List, ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id, Item.item_id == item_id)
                 .one()
             )
@@ -120,7 +123,7 @@ class ItemHandler:
         try:
             item: Item = (
                 session.query(Item)
-                .join(List, User)
+                .join(List, ListUserLink, User)
                 .filter(Item.item_id == item_id, List.list_id == list_id, User.user_id == user_id)
                 .one()
             )
@@ -154,7 +157,7 @@ class ItemHandler:
         try:
             item: Item = (
                 session.query(Item)
-                .join(List, User)
+                .join(List, ListUserLink, User)
                 .filter(Item.item_id == item_id, List.list_id == list_id, User.user_id == user_id)
                 .one()
             )

@@ -14,10 +14,9 @@ class List(BaseModel):
     __tablename__ = 'list'
 
     list_id = Column('id', postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(postgresql.UUID(as_uuid=True), ForeignKey('user.id'), primary_key=True)
     name = Column(String, default='New shopping list', nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user = relationship('User', back_populates='lists')
+    users = relationship('User', back_populates='lists', secondary='list_user_link')
     items = relationship('Item', back_populates='list', order_by='Item.order')

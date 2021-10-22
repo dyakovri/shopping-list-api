@@ -7,8 +7,7 @@ from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from starlette import status
 
-from shopping_list.models import Item, List
-from shopping_list.models.fave import Fave
+from shopping_list.models import Fave, Item, List, ListUserLink, User
 from shopping_list.schemas import ListGet
 
 
@@ -23,8 +22,13 @@ class ListHandler:
         user_id: UUID4 = Query(None, description='User ID'),
     ):
         session = db.session
-        list = List(user_id=user_id)
+        try:
+            user: User = session.query(User).filter(User.user_id == user_id).one()
+        except NoResultFound:
+            raise HTTPException(404, "List not found")
+        list = List()
         session.add(list)
+        user.lists.append(list)
         session.commit()
         return list
 
@@ -42,7 +46,10 @@ class ListHandler:
         session = db.session
         try:
             lst = (
-                session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
+                session.query(List)
+                .join(ListUserLink, User)
+                .filter(User.user_id == user_id, List.list_id == list_id)
+                .one()
             )
         except NoResultFound:
             raise HTTPException(404, "List not found")
@@ -53,31 +60,6 @@ class ListHandler:
             .all()
         )
         return {'list_id': lst.list_id, 'name': lst.name, 'items': items}
-
-    # TODO: Sharing
-    # @router.post('/{list_id}/share', response_model=ListGet, status_code=status.HTTP_200_OK)
-    # def share_list(
-    #     self,
-    #     user_id: UUID4 = Query(None, description='User ID'),
-    #     list_id: UUID4 = Query(None, description='Shopping list ID'),
-    # ):
-    #     session = db.session
-    #     try:
-    #         lst = (
-    #             session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
-    #         )
-    #     except NoResultFound:
-    #         raise HTTPException(404, "List not found")
-    #     new_lst = List()
-    #     session.add(new_lst)
-    #     for i, item in enumerate(lst.items):
-    #         if item.check:
-    #             continue
-    #         item = Item(name=item.name, order=i, check=item.check)
-    #         session.add(item)
-    #         new_lst.items.append(item)
-    #     session.commit()
-    #     return new_lst
 
     @router.post(
         '/{list_id}/checkall',
@@ -93,7 +75,10 @@ class ListHandler:
         session = db.session
         try:
             lst = (
-                session.query(List).filter(List.user_id == user_id).filter(List.list_id == list_id).one()
+                session.query(List)
+                .join(ListUserLink, User)
+                .filter(User.user_id == user_id, List.list_id == list_id)
+                .one()
             )
         except NoResultFound:
             raise HTTPException(404, "List not found")

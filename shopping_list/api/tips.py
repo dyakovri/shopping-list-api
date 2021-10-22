@@ -5,7 +5,7 @@ from fastapi_utils.cbv import cbv
 from sqlalchemy.sql.functions import func
 from starlette.status import HTTP_204_NO_CONTENT
 
-from shopping_list.models import Fave, Item, List
+from shopping_list.models import Fave, Item, List, ListUserLink, User
 from shopping_list.schemas import GoodListGet
 from shopping_list.schemas.good import FaveListGet, HistoryListGet
 
@@ -31,7 +31,8 @@ class TipsHandler:
         hist_items = (
             session.query(Item.name, Fave.fave_id)
             .join(Fave, Fave.name == Item.name)
-            .filter(List.user_id == user_id, Item.check)
+            .join(ListUserLink, User)
+            .filter(User.user_id == user_id, Item.check)
             .order_by(Item.updated_at)
             .distinct()
             .all()
