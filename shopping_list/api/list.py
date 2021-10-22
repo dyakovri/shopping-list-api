@@ -3,7 +3,6 @@ from fastapi.params import Query
 from fastapi_sqlalchemy import db
 from fastapi_utils.cbv import cbv
 from pydantic.types import UUID4
-from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from starlette import status
 

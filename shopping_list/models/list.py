@@ -4,7 +4,6 @@ from datetime import datetime
 from sqlalchemy import Column
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime, String
 
 from .base import BaseModel
@@ -20,3 +19,4 @@ class List(BaseModel):
 
     users = relationship('User', back_populates='lists', secondary='list_user_link')
     items = relationship('Item', back_populates='list', order_by='Item.order')
+    sharings = relationship('Share', back_populates='list')
