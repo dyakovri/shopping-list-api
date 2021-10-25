@@ -55,7 +55,12 @@ class ShareHandler:
             share = session.query(Share).filter(Share.share_id == share_id).one()
         except NoResultFound:
             raise HTTPException(404, "Share not found")
-        return share.list
+        return ListGet(
+            list_id=share.list.list_id,
+            name=share.list.name,
+            items=share.list.items,
+            read_only=(share.share_type == SharingOptions.RO),
+        )
 
     @router.get(
         '/users/{user_id}/share/{share_id}',
@@ -77,4 +82,9 @@ class ShareHandler:
         link = ListUserLink(user_id=user_id, list_id=share.list_id, read_only=read_only)
         session.add(link)
         session.commit()
-        return share.list
+        return ListGet(
+            list_id=share.list.list_id,
+            name=share.list.name,
+            items=share.list.items,
+            read_only=read_only,
+        )
