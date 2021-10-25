@@ -25,11 +25,11 @@ class ListHandler:
             user: User = session.query(User).filter(User.user_id == user_id).one()
         except NoResultFound:
             raise HTTPException(404, "List not found")
-        list = List()
-        session.add(list)
-        user.lists.append(list)
+        lst = List()
+        session.add(lst)
+        user.lists.append(lst)
         session.commit()
-        return list
+        return {'list_id': lst.list_id, 'name': lst.name, 'items': lst.items, 'read_only': False}
 
     @router.get(
         '/{list_id}',
@@ -44,8 +44,8 @@ class ListHandler:
     ):
         session = db.session
         try:
-            lst = (
-                session.query(List)
+            lst, read_only = (
+                session.query(List, ListUserLink.read_only)
                 .join(ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id)
                 .one()
@@ -58,13 +58,16 @@ class ListHandler:
             .order_by(Item.order)
             .all()
         )
-        return {'list_id': lst.list_id, 'name': lst.name, 'items': items}
+        return {'list_id': lst.list_id, 'name': lst.name, 'items': items, 'read_only': read_only}
 
     @router.post(
         '/{list_id}/checkall',
         response_model=ListGet,
         status_code=status.HTTP_200_OK,
-        responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
+        responses={
+            status.HTTP_404_NOT_FOUND: {'details': 'List not found'},
+            status.HTTP_403_FORBIDDEN: {'detail': 'Can not edit readonly list'},
+        },
     )
     def mark_bought(
         self,
@@ -73,15 +76,17 @@ class ListHandler:
     ):
         session = db.session
         try:
-            lst = (
-                session.query(List)
+            lst, read_only = (
+                session.query(List, ListUserLink.read_only)
                 .join(ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id)
                 .one()
             )
         except NoResultFound:
             raise HTTPException(404, "List not found")
+        if read_only:
+            raise HTTPException(403, "Can not edit readonly list")
         for item in lst.items:
             item.check = True
         session.commit()
-        return lst
+        return {'list_id': lst.list_id, 'name': lst.name, 'items': lst.items, 'read_only': read_only}

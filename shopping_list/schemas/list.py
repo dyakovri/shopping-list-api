@@ -13,3 +13,4 @@ class ShoppingList(BaseSchema):
 
 class ListGet(ShoppingList):
     items: List[ItemGet]
+    read_only: bool

@@ -22,7 +22,10 @@ class ItemHandler:
         '/',
         response_model=ItemGet,
         status_code=status.HTTP_201_CREATED,
-        responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
+        responses={
+            status.HTTP_404_NOT_FOUND: {'details': 'List not found'},
+            status.HTTP_403_FORBIDDEN: {'detail': 'Can not edit readonly list'},
+        },
     )
     def create_item(
         self,
@@ -32,12 +35,14 @@ class ItemHandler:
     ):
         session = db.session
         try:
-            lst = (
-                session.query(List)
+            lst, read_only = (
+                session.query(List, ListUserLink.read_only)
                 .join(ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id)
                 .one()
             )
+            if read_only:
+                raise HTTPException(403, "Can not edit readonly list")
             item = Item(name=item_in.name, order=item_in.order, list_id=lst.list_id)
             session.add(item)
         except (NoResultFound, IntegrityError):
@@ -54,7 +59,10 @@ class ItemHandler:
         '/{item_id}',
         response_model=ItemGet,
         status_code=status.HTTP_202_ACCEPTED,
-        responses={status.HTTP_404_NOT_FOUND: {'details': 'Item not found'}},
+        responses={
+            status.HTTP_404_NOT_FOUND: {'details': 'Item not found'},
+            status.HTTP_403_FORBIDDEN: {'detail': 'Can not edit readonly list'},
+        },
     )
     def change_item(
         self,
@@ -65,14 +73,17 @@ class ItemHandler:
     ):
         session = db.session
         try:
-            item = (
-                session.query(Item)
+            item, read_only = (
+                session.query(Item, ListUserLink.read_only)
+                .select_from(Item)
                 .join(List, ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id, Item.item_id == item_id)
                 .one()
             )
         except NoResultFound:
             raise HTTPException(404, "Item not found")
+        if read_only:
+            raise HTTPException(403, "Can not edit readonly list")
         item = Item(item_id=item_id, list_id=list_id, **item_in.dict(exclude_unset=True))
         item = session.merge(item)
         session.commit()
@@ -86,7 +97,10 @@ class ItemHandler:
     @router.delete(
         '/{item_id}',
         status_code=status.HTTP_204_NO_CONTENT,
-        responses={status.HTTP_404_NOT_FOUND: {'details': 'Item not found'}},
+        responses={
+            status.HTTP_404_NOT_FOUND: {'details': 'Item not found'},
+            status.HTTP_403_FORBIDDEN: {'detail': 'Can not edit readonly list'},
+        },
     )
     def delete_item(
         self,
@@ -94,16 +108,20 @@ class ItemHandler:
         list_id: UUID4 = Query(None, description='Shopping list ID'),
         item_id: UUID4 = Query(None, description='Shopping list item ID'),
     ):
+        # TODO: Fix
         session = db.session
         try:
-            item = (
-                session.query(Item)
+            item, read_only = (
+                session.query(Item, ListUserLink.read_only)
+                .select_from(Item)
                 .join(List, ListUserLink, User)
                 .filter(User.user_id == user_id, List.list_id == list_id, Item.item_id == item_id)
                 .one()
             )
         except NoResultFound:
             raise HTTPException(404, "Item not found")
+        if read_only:
+            raise HTTPException(403, "Can not edit readonly list")
         session.delete(item)
         session.commit()
 
