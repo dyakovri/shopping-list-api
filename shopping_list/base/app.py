@@ -29,12 +29,10 @@ def create_app() -> FastAPI:
         session_args={'autocommit': False, 'autoflush': False},
     )
     app.add_middleware(
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
     return app
