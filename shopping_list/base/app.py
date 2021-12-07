@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware
 
 from shopping_list import __version__
@@ -26,5 +27,14 @@ def create_app() -> FastAPI:
         db_url=settings.DB_DSN,
         engine_args={'pool_pre_ping': True},
         session_args={'autocommit': False, 'autoflush': False},
+    )
+    app.add_middleware(
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
     )
     return app
