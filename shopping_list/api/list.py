@@ -54,7 +54,9 @@ class ListHandler:
             raise HTTPException(404, "List not found")
         items = (
             session.query(Item.item_id, Item.name, Item.check, Fave.fave_id)
-            .outerjoin(Fave, Fave.name == Item.name)
+            .join(Fave, Fave.name == Item.name)
+            .join(List, User)
+            .filter(User.user_id == user_id, List.list_id == list_id)
             .order_by(Item.order)
             .all()
         )
