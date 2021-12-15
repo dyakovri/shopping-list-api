@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from fastapi.params import Query
+from fastapi.params import Query, Body
 from fastapi_sqlalchemy import db
 from fastapi_utils.cbv import cbv
 from pydantic.types import UUID4
@@ -7,7 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from starlette import status
 
 from shopping_list.models import Fave, Item, List, ListUserLink, User
-from shopping_list.schemas import ListGet
+from shopping_list.schemas import ListGet, ListCreate
 
 
 router = APIRouter()
@@ -18,6 +18,7 @@ class ListHandler:
     @router.post('/', response_model=ListGet, status_code=status.HTTP_201_CREATED)
     def create_list(
         self,
+        list_args: ListCreate,
         user_id: UUID4 = Query(None, description='User ID'),
     ):
         session = db.session
@@ -25,7 +26,7 @@ class ListHandler:
             user: User = session.query(User).filter(User.user_id == user_id).one()
         except NoResultFound:
             raise HTTPException(404, "List not found")
-        lst = List()
+        lst = List(name=list_args.name)
         session.add(lst)
         user.lists.append(lst)
         session.commit()

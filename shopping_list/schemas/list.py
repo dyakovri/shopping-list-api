@@ -11,6 +11,10 @@ class ShoppingList(BaseSchema):
     name: str
 
 
+class ListCreate(BaseSchema):
+    name: str = 'New shopping list'
+
+
 class ListGet(ShoppingList):
     items: List[ItemGet]
     read_only: bool
