@@ -1,7 +1,9 @@
 from fastapi import APIRouter
+from fastapi.exceptions import HTTPException
 from fastapi.params import Query
 from fastapi_sqlalchemy import db
 from fastapi_utils.cbv import cbv
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 from starlette.status import HTTP_204_NO_CONTENT
 
@@ -53,9 +55,13 @@ class TipsHandler:
     @router.delete('/favourites/{fave_id}', status_code=HTTP_204_NO_CONTENT)
     def delete_favourite(self, user_id, fave_id):
         session = db.session
-        (
-            session.query(Fave.name, Fave.fave_id)
-            .filter(Fave.user_id == user_id, Fave.fave_id == fave_id)
-            .delete()
-        )
+        try:
+            fave_item = (
+                session.query(Fave)
+                .filter(Fave.user_id == user_id, Fave.fave_id == fave_id)
+                .one()
+            )
+        except NoResultFound:
+            raise HTTPException(404, "List not found")
+        session.delete(fave_item)
         session.commit()
