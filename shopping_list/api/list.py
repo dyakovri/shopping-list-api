@@ -39,7 +39,7 @@ class ListHandler:
         responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
     )
     def get_list(
-        self,
+        *,
         user_id: UUID4 = Query(None, description='User ID'),
         list_id: UUID4 = Query(None, description='Shopping list ID'),
     ):

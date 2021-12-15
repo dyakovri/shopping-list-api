@@ -20,6 +20,8 @@ class GoodListGet(BaseSchema):
 
 
 class HistoryGet(Good):
+    item_id: Optional[UUID4] = Field(description='Id of item in list')
+    list_id: Optional[UUID4] = Field(description='Id of list which item in')
     fave_id: Optional[UUID4] = Field(description='Id of fave if product in favourites list')
 
 

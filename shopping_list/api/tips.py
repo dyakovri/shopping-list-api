@@ -29,9 +29,9 @@ class TipsHandler:
     def get_history(self, user_id):
         session = db.session
         hist_items = (
-            session.query(Item.name, Fave.fave_id)
-            .join(Fave, Fave.name == Item.name)
-            .join(ListUserLink, User)
+            session.query(Item.name, Item.list_id, Item.item_id, Fave.fave_id)
+            .outerjoin(Fave, Fave.name == Item.name)
+            .join(List, ListUserLink, User)
             .filter(User.user_id == user_id, Item.check)
             .order_by(Item.updated_at)
             .distinct()
