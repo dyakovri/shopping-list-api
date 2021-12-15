@@ -63,6 +63,29 @@ class ListHandler:
         )
         return {'list_id': lst.list_id, 'name': lst.name, 'items': items, 'read_only': read_only}
 
+    @router.delete(
+        '/{list_id}',
+        status_code=status.HTTP_204_NO_CONTENT,
+        responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
+    )
+    def get_list(
+        self,
+        user_id: UUID4 = Query(None, description='User ID'),
+        list_id: UUID4 = Query(None, description='Shopping list ID'),
+    ):
+        session = db.session
+        try:
+            lst = (
+                session.query(List)
+                .join(ListUserLink, User)
+                .filter(User.user_id == user_id, List.list_id == list_id)
+                .one()
+            )
+        except NoResultFound:
+            raise HTTPException(404, "List not found")
+        session.delete(lst)
+        session.commit()
+
     @router.post(
         '/{list_id}/checkall',
         response_model=ListGet,
