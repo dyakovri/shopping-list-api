@@ -39,7 +39,7 @@ class ListHandler:
         responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
     )
     def get_list(
-        *,
+        self,
         user_id: UUID4 = Query(None, description='User ID'),
         list_id: UUID4 = Query(None, description='Shopping list ID'),
     ):
@@ -55,10 +55,11 @@ class ListHandler:
             raise HTTPException(404, "List not found")
         items = (
             session.query(Item.item_id, Item.name, Item.check, Fave.fave_id)
-            .join(Fave, Fave.name == Item.name)
-            .join(List, User)
-            .filter(User.user_id == user_id, List.list_id == list_id)
+            .join(List, ListUserLink)
+            .outerjoin(Fave, Fave.name == Item.name)
+            .filter(User.user_id == user_id, ListUserLink.list_id == list_id)
             .order_by(Item.order)
+            .distinct()
             .all()
         )
         return {'list_id': lst.list_id, 'name': lst.name, 'items': items, 'read_only': read_only}
@@ -68,7 +69,7 @@ class ListHandler:
         status_code=status.HTTP_204_NO_CONTENT,
         responses={status.HTTP_404_NOT_FOUND: {'details': 'List not found'}},
     )
-    def get_list(
+    def delete_list(
         self,
         user_id: UUID4 = Query(None, description='User ID'),
         list_id: UUID4 = Query(None, description='Shopping list ID'),
